@@ -1,9 +1,8 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -58,4 +57,53 @@ public class DotProperties {
         return Files.walk(root)
                 .map(Path::toFile);
     }
+
+    public String getValueOf(String key) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(dotProperties))) {
+            String line;
+            boolean secured = false;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("#<secure>")) secured = true;
+                else if (secured && line.contains("#</secure>")) secured = false;
+
+                if (secured) continue;
+                String[] side = line.split("=");
+                if (side[0].equalsIgnoreCase(key)) {
+                    return side[1];
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        throw new NoSuchElementException("property " + key + " was not found");
+    }
+
+    public void setKeyAndValue(String key, String value, boolean secure) {
+
+        StringBuilder injectLine = new StringBuilder();
+        injectLine.append("\n");
+        if (secure) injectLine.append("#<secure>\n");
+        injectLine.append(key).append("=").append(value);
+        if (secure) injectLine.append("\n#</secure>");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(dotProperties))) {
+
+            StringBuilder dotFile = new StringBuilder();
+            String fileLine;
+            while ((fileLine = reader.readLine()) != null) {
+                String[] part = fileLine.split("=");
+                if (part[0].equals(key)) {
+                    dotFile.append(injectLine.toString()).append("\n");
+                } else {
+                    dotFile.append(fileLine).append("\n");
+                }
+            }
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(dotProperties))) {
+                writer.write(dotFile.toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
