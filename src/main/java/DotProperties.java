@@ -62,11 +62,9 @@ public class DotProperties {
         try (BufferedReader reader = new BufferedReader(new FileReader(dotProperties))) {
             String line;
             boolean secured = false;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("#<secure>")) secured = true;
-                else if (secured && line.contains("#</secure>")) secured = false;
+            while (((line = reader.readLine()) != null)) {
+                if ((secured = isSecure(line, secured))) continue;
 
-                if (secured) continue;
                 String[] side = line.split("=");
                 if (side[0].equalsIgnoreCase(key)) {
                     return side[1];
@@ -76,5 +74,13 @@ public class DotProperties {
             e.printStackTrace();
         }
         throw new NoSuchElementException("property " + key + " was not found");
+    }
+
+    private boolean isSecure(String line, boolean secured) {
+        if (secured) {
+            return !line.contains("#</secure>");
+        } else {
+            return line.contains("#<secure>");
+        }
     }
 }
