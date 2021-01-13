@@ -77,33 +77,4 @@ public class DotProperties {
         }
         throw new NoSuchElementException("property " + key + " was not found");
     }
-
-    public void setKeyAndValue(String key, String value, boolean secure) {
-
-        StringBuilder injectLine = new StringBuilder();
-        injectLine.append("\n");
-        if (secure) injectLine.append("#<secure>\n");
-        injectLine.append(key).append("=").append(value);
-        if (secure) injectLine.append("\n#</secure>");
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(dotProperties))) {
-
-            StringBuilder dotFile = new StringBuilder();
-            String fileLine;
-            while ((fileLine = reader.readLine()) != null) {
-                String[] part = fileLine.split("=");
-                if (part[0].equals(key)) {
-                    dotFile.append(injectLine.toString()).append("\n");
-                } else {
-                    dotFile.append(fileLine).append("\n");
-                }
-            }
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(dotProperties))) {
-                writer.write(dotFile.toString());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
