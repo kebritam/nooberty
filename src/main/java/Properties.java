@@ -12,8 +12,9 @@ import java.util.stream.Stream;
  * Created on 16/03/2021
  */
 
-public abstract class Properties {
-    abstract public String getValueOf(String key) throws NoSuchElementException;
+public interface Properties {
+
+    String getValueOf(String key) throws NoSuchElementException;
 
     static File findDotProperties(String propertiesName) {
         File[] fileArray = getFiles();
@@ -38,7 +39,7 @@ public abstract class Properties {
         return files;
     }
 
-    boolean isSecure(String line, boolean secured) {
+    default boolean isSecure(String line, boolean secured) {
         if (secured) {
             return !line.contains("#</secure>");
         } else {

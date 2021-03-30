@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
  * Created on 11/01/2021
  */
 
-public final class DotProperties extends Properties {
+public final class DotProperties implements Properties {
 
     private final File dotProperties;
 
@@ -30,7 +30,7 @@ public final class DotProperties extends Properties {
     }
 
     @Override
-    public String getValueOf(String key) {
+    public final String getValueOf(String key) {
         String value = null;
         try (BufferedReader reader = new BufferedReader(new FileReader(dotProperties))) {
             value = iterateLines(reader, key);

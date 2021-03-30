@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentMap;
  * Created on 16/03/2021
  */
 
-public final class CachedDotProperties extends Properties {
+public final class CachedDotProperties implements Properties {
 
     private final ConcurrentMap<String, String> map;
     private final File dotProperties;
@@ -56,7 +56,7 @@ public final class CachedDotProperties extends Properties {
     }
 
     @Override
-    public String getValueOf(String key) {
+    public final String getValueOf(String key) {
         return map.get(key);
     }
 }
